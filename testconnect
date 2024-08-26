@@ -1,0 +1,37 @@
+import java.sql.*;
+
+public class TestConnect {
+
+    public static void main(String[] args) throws ClassNotFoundException, SQLException {
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        String url = "jdbc:sqlserver://localhost:1433 ; databaseName=Bai1";
+        String user = "sa2";
+        String pass = "123";
+        Connection connect = DriverManager.getConnection(url, user, pass);
+
+//        if(connect != null) {
+//            System.out.println("succes");
+//        }
+//        else {
+//            System.out.println("error");
+//        }
+        Statement sttm = connect.createStatement();
+        String sql = "select * from Employees";
+
+        ResultSet rs = sttm.executeQuery(sql);
+
+        while (rs.next()) {
+            System.out.print("ID: " + rs.getInt(1) + " ");
+            System.out.print("FirstName: " + rs.getString(2) + " ");
+            System.out.print("LastName: " + rs.getString(3) + " ");
+            System.out.print("age: " + rs.getInt(4) + " ");
+            System.out.println("");
+
+        }
+        rs.close();
+        sttm.close();
+        connect.close();
+
+    }
+
+}
