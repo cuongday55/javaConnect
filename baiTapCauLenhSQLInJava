@@ -44,6 +44,7 @@ public class TestConnect {
                         + "2. cap nhat tuoi\n"
                         + "3. xoa nv\n"
                         + "4. them moi\n"
+                        + "5. tim kiem\n"
                         + "0 thoat chuong trinh\n"
                         + "chon chuc nang: ");
                 byte chon = new Scanner(System.in).nextByte();
@@ -59,6 +60,9 @@ public class TestConnect {
                 } else if (chon == 4) {
                     System.out.println("ban da chon chuc nang 4!");
                     themNV(connect);
+                } else if (chon == 5) {
+                    System.out.println("ban da chon chuc nang 5!");
+                    timKiemSV(connect);
                 } else if (chon == 0) {
                     System.out.println("ban da chon chuc nang 0!");
                     System.exit(0);
@@ -107,27 +111,79 @@ public class TestConnect {
         Scanner sc = new Scanner(System.in);
         System.out.print("nhap id can cap xoa: ");
         int ID = Integer.parseInt(sc.nextLine());
-        String sql = "DELETE Employees WHERE ID = " + ID;
-        Statement sttm = connect.createStatement();
-        int sl = sttm.executeUpdate(sql);
-        System.out.println("da co " + sl + " nhan vien duoc xoa!");
+        if (checkID(ID, connect)) {
+            String sql = "DELETE Employees WHERE ID = " + ID;
+            Statement sttm = connect.createStatement();
+            int sl = sttm.executeUpdate(sql);
+            System.out.println("da co " + sl + " nhan vien duoc xoa!");
+            sttm.close();
+        } else {
+            System.out.println("khong ton tai id");
+        }
     }
 
     private static void themNV(Connection connect) throws SQLException {
         Scanner sc = new Scanner(System.in);
-         System.out.print("nhap id: ");
+        System.out.print("nhap id: ");
         int ID = Integer.parseInt(sc.nextLine());
-         System.out.print("nhap FirstName: ");
+        System.out.print("nhap FirstName: ");
         String FirstName = sc.nextLine();
         System.out.print("nhap LastName: ");
         String LastName = sc.nextLine();
-         System.out.print("nhap tuoi: ");
+        System.out.print("nhap tuoi: ");
         int age = Integer.parseInt(sc.nextLine());
-        
-        String sql = "INSERT INTO Employees (ID , FirstName , LastName , age) values('"+ID+"','"+FirstName+"','"+LastName+"','"+age+"')";
+        if (!checkID(ID, connect)) {
+            String sql = "INSERT INTO Employees (ID , FirstName , LastName , age) "
+                    + "values(" + ID + ",'" + FirstName + "','" + LastName + "','" + age + "')";
+            Statement sttm = connect.createStatement();
+            int sl = sttm.executeUpdate(sql);
+            System.out.println("da co " + sl + " nhan vien duoc them!");
+            sttm.close();
+        } else {
+            System.out.println("da ton tai ma nhan vien");
+        }
+
+    }
+
+    private static void timKiemSV(Connection connect) throws SQLException {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("nhap id can tim kiem: ");
+        int ID = Integer.parseInt(sc.nextLine());
+
+        if (checkID(ID, connect)) {
+            String sql = "SELECT * FROM Employees WHERE ID = " + ID;
+            Statement sttm = connect.createStatement();
+            ResultSet rs = sttm.executeQuery(sql);
+            while (rs.next()) {
+                System.out.print("ID: " + rs.getInt(1) + " ");
+                System.out.print("FirstName: " + rs.getString(2) + " ");
+                System.out.print("LastName: " + rs.getString(3) + " ");
+                System.out.print("age: " + rs.getInt(4) + " ");
+                System.out.println("");
+            }
+            rs.close();
+            sttm.close();
+        } else {
+            System.out.println("ma khong ton tai!");
+        }
+    }
+
+    private static boolean checkID(int id, Connection connect) throws SQLException {
         Statement sttm = connect.createStatement();
-        int sl = sttm.executeUpdate(sql);
-        System.out.println("da co " + sl + " nhan vien duoc xoa!");
+        String sql = "select ID from Employees";
+
+        ResultSet rs = sttm.executeQuery(sql);
+
+        while (rs.next()) {
+            if (rs.getInt(1) == id) {
+                rs.close();
+                sttm.close();
+                return true;
+            }
+        }
+        rs.close();
+        sttm.close();
+        return false;
     }
 
 }
