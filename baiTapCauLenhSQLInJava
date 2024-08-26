@@ -1,0 +1,133 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package test;
+
+/**
+ *
+ * @author cuongtc
+ */
+import java.sql.*;
+import java.util.Scanner;
+import static javax.swing.text.html.HTML.Attribute.ID;
+
+public class TestConnect {
+
+    public static void main(String[] args) {
+        try {
+            Connection connect = ketNoi();
+//            check connect
+            System.out.println(connect != null);
+            menu(connect);
+
+            connect.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static Connection ketNoi() throws ClassNotFoundException, SQLException {
+
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        String url = "jdbc:sqlserver://localhost:1433 ; databaseName=Bai1";
+        String user = "sa2";
+        String pass = "123";
+        Connection connect = DriverManager.getConnection(url, user, pass);
+        return connect;
+    }
+
+    private static void menu(Connection connect) {
+        while (true) {
+            try {
+                System.out.print("1. hieu thi thong tin\n"
+                        + "2. cap nhat tuoi\n"
+                        + "3. xoa nv\n"
+                        + "4. them moi\n"
+                        + "0 thoat chuong trinh\n"
+                        + "chon chuc nang: ");
+                byte chon = new Scanner(System.in).nextByte();
+                if (chon == 1) {
+                    System.out.println("ban da chon chuc nang 1!");
+                    hienThi(connect);
+                } else if (chon == 2) {
+                    System.out.println("ban da chon chuc nang 2!");
+                    capNhatTuoi(connect);
+                } else if (chon == 3) {
+                    System.out.println("ban da chon chuc nang 3!");
+                    xoaNV(connect);
+                } else if (chon == 4) {
+                    System.out.println("ban da chon chuc nang 4!");
+                    themNV(connect);
+                } else if (chon == 0) {
+                    System.out.println("ban da chon chuc nang 0!");
+                    System.exit(0);
+                } else {
+                    System.out.println("ban chon sai! moi chon lai");
+                }
+            } catch (Exception e) {
+                System.out.println("yeu cua nhap dung dinh dang");
+            }
+        }
+    }
+
+    private static void hienThi(Connection connect) throws SQLException {
+        Statement sttm = connect.createStatement();
+        String sql = "select * from Employees";
+
+        ResultSet rs = sttm.executeQuery(sql);
+
+        while (rs.next()) {
+            System.out.print("ID: \t" + rs.getInt(1) + "\t");
+            System.out.print("FirstName: \t" + rs.getString(2) + "\t");
+            System.out.print("LastName: \t" + rs.getString(3) + "\t");
+            System.out.print("age: \t" + rs.getInt(4) + "\t");
+            System.out.println("");
+        }
+        rs.close();
+        sttm.close();
+    }
+
+    private static void capNhatTuoi(Connection connect) throws SQLException {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("nhap id can cap nhat tuoi: ");
+        int ID = Integer.parseInt(sc.nextLine());
+        System.out.print("nhap tuoi: ");
+        int age = Integer.parseInt(sc.nextLine());
+
+        String sql = "UPDATE Employees SET age = " + age + "WHERE ID = " + ID;
+        Statement sttm = connect.createStatement();
+        int sl = sttm.executeUpdate(sql);
+        System.out.println("da co " + sl + " nhan vien duoc cap nhat!");
+        sttm.close();
+    }
+
+    private static void xoaNV(Connection connect) throws SQLException {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("nhap id can cap xoa: ");
+        int ID = Integer.parseInt(sc.nextLine());
+        String sql = "DELETE Employees WHERE ID = " + ID;
+        Statement sttm = connect.createStatement();
+        int sl = sttm.executeUpdate(sql);
+        System.out.println("da co " + sl + " nhan vien duoc xoa!");
+    }
+
+    private static void themNV(Connection connect) throws SQLException {
+        Scanner sc = new Scanner(System.in);
+         System.out.print("nhap id: ");
+        int ID = Integer.parseInt(sc.nextLine());
+         System.out.print("nhap FirstName: ");
+        String FirstName = sc.nextLine();
+        System.out.print("nhap LastName: ");
+        String LastName = sc.nextLine();
+         System.out.print("nhap tuoi: ");
+        int age = Integer.parseInt(sc.nextLine());
+        
+        String sql = "INSERT INTO Employees (ID , FirstName , LastName , age) values('"+ID+"','"+FirstName+"','"+LastName+"','"+age+"')";
+        Statement sttm = connect.createStatement();
+        int sl = sttm.executeUpdate(sql);
+        System.out.println("da co " + sl + " nhan vien duoc xoa!");
+    }
+
+}
